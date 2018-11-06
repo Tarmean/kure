@@ -47,6 +47,9 @@ import Data.Monoid
 #if __GLASGOW_HASKELL__ >= 708
 import Data.Typeable
 #endif
+#if __GLASGOW_HASKELL__ >= 800
+import Data.Semigroup (Semigroup(..))
+#endif
 
 import Language.KURE.MonadCatch
 
@@ -246,6 +249,14 @@ instance Monad m => ArrowApply (Transform c m) where
    {-# INLINE app #-}
 
 ------------------------------------------------------------------------------------------
+--
+#if __GLASGOW_HASKELL__ >= 800
+-- | Lifting through the 'Monad' and a Reader transformer, where (c,a) is the read-only environment.
+instance (Applicative m, Semigroup b) => Semigroup (Transform c m a b) where
+   (<>) :: Transform c m a b -> Transform c m a b -> Transform c m a b
+   (<>) = liftA2 (<>)
+   {-# INLINE (<>) #-}
+#endif
 
 -- | Lifting through the 'Monad' and a Reader transformer, where (c,a) is the read-only environment.
 instance (Monad m, Monoid b) => Monoid (Transform c m a b) where

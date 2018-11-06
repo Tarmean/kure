@@ -46,6 +46,9 @@ where
 #if __GLASGOW_HASKELL__ <= 708
 import Data.Monoid
 #endif
+#if __GLASGOW_HASKELL__ >= 800
+import Data.Semigroup (Semigroup(..))
+#endif
 
 import Control.Arrow ((>>^))
 
@@ -65,6 +68,13 @@ type Path crumb = [crumb]
 
 -- | A 'SnocPath' is a list stored in reverse order.
 newtype SnocPath crumb = SnocPath [crumb] deriving (Eq, Typeable)
+
+#if __GLASGOW_HASKELL__ >= 800
+-- | Lifting through the 'Monad' and a Reader transformer, where (c,a) is the read-only environment.
+instance Semigroup (SnocPath crumb) where
+   (<>) (SnocPath p1) (SnocPath p2) = SnocPath (p2 ++ p1)
+   {-# INLINE (<>) #-}
+#endif
 
 instance Monoid (SnocPath crumb) where
    mempty :: SnocPath crumb
